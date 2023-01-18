@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Users/Intel/Desktop/CapstoneProject.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure pragmas query" current="2"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="125"/><column_width id="3" width="1100"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,15:mainTR_PropertyInfo"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1">--1
+select MAX(Quantity) AS MAX_QUANTITY from TR_OrderDetails;
+
+--2
+SELECT COUNT(OrderID) as ORDERids_MAX from TR_OrderDetails
+WHERE Quantity = (
+select MAX(Quantity) AS MAX_QUANTITY from TR_OrderDetails
+);
+
+--3
+SELECT COUNT(*) AS DIFF_TYPES_CHAIRS FROM TR_Products
+WHERE ProductName like &quot;%Chair&quot;;
+
+--4
+SELECT AVG(Price) as avg_price_chairs FROM TR_Products
+WHERE ProductName like &quot;%Chair&quot;;
+
+--5
+SELECT * FROM TR_PropertyInfo
+WHERE LENGTH(PropertyState)&gt; 10;
+
+
+--6
+SELECT * FROM TR_PropertyInfo
+WHERE PropertyState LIKE &quot;_e%&quot;;
+
+--7
+SELECT MAX(PRICE) AS MAX_PRICE,MIN(PRICE) AS MIN_PRICE
+FROM(
+SELECT * from TR_Products
+WHERE ProductCategory = &quot;Office Supplies&quot;);
+
+--9
+SELECT PropertyState,COUNT(OrderID) AS ORDERS_COUNT
+FROM(
+SELECT * 
+FROM TR_OrderDetails
+LEFT JOIN TR_PropertyInfo
+ON  TR_PropertyInfo.PropertyID = TR_OrderDetails.PropertyID)
+GROUP BY PropertyState;
+
+--10
+select ProductCategory,round(avg(price),2) as average_price FROM
+TR_Products
+group by ProductCategory
+order by average_price desc
+;
+
+--11
+select ProductCategory,count(*) as total_items FROM
+TR_Products
+group by ProductCategory
+order by total_items limit 1
+;
+
+--13
+select * from 
+(select ProductCategory,round(avg(price),2) as average_price FROM
+TR_Products
+group by ProductCategory)
+where average_price&gt;25;
+
+--14
+SELECT ProductID,SUM(Quantity)
+ FROM TR_OrderDetails
+ GROUP BY ProductID
+ ORDER BY 2 DESC
+ LIMIT 5;
+ 
+--15
+WITH ctes as(
+SELECT ProductID,SUM(Quantity) as SUM_QTY
+FROM TR_OrderDetails
+GROUP BY ProductID)
+ 
+SELECT ctes.ProductID,ctes.SUM_QTY,ProductName 
+FROM ctes
+left join TR_Products
+ON ctes.ProductID = TR_Products.ProductID
+order by 2 DESC
+limit 5;
+
+--17
+WITH ash as(
+SELECT * , Price*Quantity as total_price
+FROM TR_OrderDetails
+LEFT JOIN TR_Products
+ON  TR_Products.ProductID = TR_OrderDetails.ProductID
+)
+SELECT ProductName,ProductID,SUM(total_price) AS TOTAL_SALES
+FROM ash
+GROUP BY ProductName,ProductID
+ORDER BY 3
+LIMIT 5;
+
+--18
+WITH aru as(
+SELECT * , Price*Quantity as total_price
+FROM TR_OrderDetails
+LEFT JOIN TR_Products
+ON  TR_Products.ProductID = TR_OrderDetails.ProductID
+WHERE PropertyID = (
+SELECT PropertyID FROM TR_PropertyInfo
+where PropertyCity = &quot;Orlando&quot; 
+)
+)
+SELECT ProductName,ProductID,SUM(total_price) AS TOTAL_SALES
+FROM aru
+GROUP BY ProductName,ProductID
+ORDER BY 3
+LIMIT 5;
+
+--20
+select PropertyState,group_concat(PropertyCity)AS CITIES FROM
+TR_PropertyInfo
+group by PropertyState;
+
+
+
+ 
+ 
+
+
+</sql><current_tab id="0"/></tab_sql></sqlb_project>
